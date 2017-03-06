@@ -15,13 +15,15 @@ Install
 -------
 
 ::
-	$ python setup.py install
+
+    $ python setup.py install
 
 Test
 ----
 
 ::
-	$ py.test
+
+    $ py.test
 
 How to use
 ----------
