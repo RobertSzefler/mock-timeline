@@ -167,8 +167,25 @@ class TestMonkeyPatching:
         monkey_patch_mock()
 
     @pytest.mark.usefixtures('mock_cleanup')
+    def test_monkey_unpatch_mock_twice(self):
+        monkey_patch_mock()
+        monkey_unpatch_mock()
+        with pytest.raises(RuntimeError):
+            monkey_unpatch_mock()
+        # TODO
+
+    @pytest.mark.usefixtures('mock_cleanup')
     def test_patched_mock(self):
-        pass
+        # TODO rethink this test, it's quite sketchy
+        with patched_mock():
+            m_with_instrumentation = mock.Mock()
+            m_with_instrumentation()
+            assert isinstance(
+                m_with_instrumentation.get_call().global_clock, int
+            )
+        m_without_instrumentation = mock.Mock()
+        assert isinstance(m_with_instrumentation.get_call(), mock.Mock)
+        assert isinstance(m_without_instrumentation.get_call(), mock.Mock)
 
 
 class TestCallEvent:
@@ -178,7 +195,7 @@ class TestCallEvent:
 
 
 def ignoreme():
-
+    # TODO
     monkey_patch_mock()
 
     m1 = mock.Mock()

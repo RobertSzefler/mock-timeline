@@ -134,7 +134,10 @@ def monkey_unpatch_mock():
         raise RuntimeError(
             'monkey_unpatch_mock called and mock has not been patched before'
         )
-    # TODO
+    for name in vars(TimelineTrackingMock).keys():
+        if name in ['__module__', '__doc__']:
+            continue
+        delattr(mock.Mock, name)
     del mock._is_patched_by_mock_timeline
 
 
@@ -156,7 +159,3 @@ class CallEvent(object):
 
     def __gt__(self, other):
         return self.call.global_clock > other.call.global_clock
-
-    def __eq__(self, other):
-        # XXX is this really needed?
-        return self == other
