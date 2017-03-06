@@ -1,8 +1,15 @@
 from __future__ import print_function
+
+try:  # pragma: no cover
+    # We need to bypass mock.__init__'s notorious namespace cloaking.
+    import mock.mock as mock
+except ImportError:  # pragma: no cover
+    import unittest.mock as mock
+
 import pytest
 
 from mock_timeline import (
-    assert_call_order, CallEvent, mock, MockTimelineAssertionError,
+    assert_call_order, CallEvent, MockTimelineAssertionError,
     monkey_patch_mock, patched_mock, TimelineTrackingMock, monkey_unpatch_mock
 )
 
@@ -52,7 +59,7 @@ class TestTimelineTrackingMock:
         a_mock(1, 2, x=3)
         a_mock(42)
         with pytest.raises(AssertionError) as exc:
-            call = a_mock.get_call(777, x=[])
+            a_mock.get_call(777, x=[])
         assert exc.value.__class__ == AssertionError
         assert str(exc.value) == 'mock(777, x=[]) call not found'
 
@@ -63,7 +70,7 @@ class TestTimelineTrackingMock:
         a_mock(5, y=1)
         a_mock(42)
         with pytest.raises(MockTimelineAssertionError) as exc:
-            call = a_mock.get_call(42)
+            a_mock.get_call(42)
         assert str(exc.value) == 'mock(42) executed more than once'
 
     def test_assert_executed_before(self, mock_1, mock_2):
@@ -129,6 +136,13 @@ class TestAssertCallOrder:
             call_2._parent_mock, call_3._parent_mock
         )
 
+    def test_more_complex(self):
+        mock = TimelineTrackingMock()
+        mock.f()
+        mock.g()
+        mock.h()
+        assert_call_order([mock.f.get_call(), mock.g.get_call()])
+
 
 class TestMonkeyPatching:
     @pytest.yield_fixture
@@ -158,7 +172,9 @@ class TestMonkeyPatching:
 
 
 class TestCallEvent:
-    pass
+    def test_init(self):
+        event = CallEvent(mock.sentinel.call)
+        assert event.call == mock.sentinel.call
 
 
 def ignoreme():

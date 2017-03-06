@@ -28,4 +28,28 @@ Test
 How to use
 ----------
 
+The following examples are written using python 3. For python 2, you'd need to change the mock
+import, basically.
+
+.. code-block:: python
+
+    from unittest.mock import Mock
+    from mock_timeline import assert_call_order, patched_mock
+
+    with patched_mock():
+        mock = Mock()
+        mock.f()
+        mock.g()
+        mock.h()
+        assert_call_order([mock.f.get_call(), mock.g.get_call()])
+
 TODO
+
+Issues
+------
+
+* The code is not production ready. Currently it's a proof of concept.
+* Not thread safe at all.
+* Does not support interprocess event ordering.
+* The implementation relies heavily on monkey-patching mock/unittest.mock's internals; I would
+  not expect it to be stable after major changes in said libraries.
