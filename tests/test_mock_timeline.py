@@ -136,12 +136,23 @@ class TestAssertCallOrder:
             call_2._parent_mock, call_3._parent_mock
         )
 
-    def test_more_complex(self):
+    def test_more_complex_ok(self):
         mock = TimelineTrackingMock()
         mock.f()
-        mock.g()
-        mock.h()
-        assert_call_order([mock.f.get_call(), mock.g.get_call()])
+        mock.g.x()
+        mock.h.y()
+        assert_call_order([mock.f.get_call(), mock.h.y.get_call()])
+
+    def test_more_complex_fail(self):
+        mock = TimelineTrackingMock()
+        mock.f()
+        mock.g.x()
+        mock.h.y()
+        with pytest.raises(MockTimelineAssertionError) as exc:
+            assert_call_order([mock.h.y.get_call(), mock.g.x.get_call()])
+        assert str(exc.value) == '{}() executed before {}()'.format(
+            mock.g.x, mock.h.y
+        )
 
 
 class TestMonkeyPatching:

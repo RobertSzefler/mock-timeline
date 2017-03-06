@@ -31,6 +31,8 @@ How to use
 The following examples are written using python 3. For python 2, you'd need to change the mock
 import, basically.
 
+Example 1:
+
 .. code-block:: python
 
     from unittest.mock import Mock
@@ -42,6 +44,19 @@ import, basically.
         mock.g()
         mock.h()
         assert_call_order([mock.f.get_call(), mock.g.get_call()])
+
+Example 2:
+
+.. code-block:: python
+
+    from unittest.mock import Mock
+    from mock_timeline import patched_mock
+
+    with patched_mock():
+        mock = Mock()
+        mock.x.y(42)
+        mock.z([], a=1)
+        mock.x.y.get_call(42).assert_executed_before(mock.z.get_call([], a=1))
 
 TODO
 
